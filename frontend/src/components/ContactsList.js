@@ -1,27 +1,55 @@
-import React from "react";
+import React, { useState } from "react";
 
 const ContactsList = ({ contacts }) => {
+  const [expandedContactId, setExpandedContactId] = useState(null);
+
   return (
-    <div
-      style={{
-        maxWidth: "600px",
-        margin: "20px auto",
-        padding: "10px",
-        border: "1px solid #ddd",
-        borderRadius: "5px",
-      }}
-    >
-      <h2 style={{ textAlign: "center" }}>Contacts</h2>
-      <ul style={{ listStyleType: "none", padding: "0" }}>
-        {contacts.map((contact) => (
-          <li
-            key={contact.id}
-            style={{ padding: "10px", borderBottom: "1px solid #eee" }}
-          >
-            {contact.name} - {contact.email}
-          </li>
-        ))}
-      </ul>
+    <div className="container mt-4" style={{ maxWidth: "600px" }}>
+      <h3 className="text-center mb-4">Contacts List</h3>
+      {contacts.map((contact) => (
+        <div
+          key={contact.id}
+          className="card mb-3"
+          style={{
+            cursor: "pointer",
+            borderRadius: "5px",
+            border: "1px solid #aaa",
+          }}
+          onClick={() =>
+            setExpandedContactId(
+              contact.id === expandedContactId ? null : contact.id
+            )
+          }
+        >
+          <div className="card-body">
+            <h5 className="card-title">{contact.name}</h5>
+            {contact.id === expandedContactId && (
+              <div>
+                <p>
+                  <strong>Username:</strong> {contact.username}
+                </p>
+                <p>
+                  <strong>Email:</strong> {contact.email}
+                </p>
+                <p>
+                  <strong>Phone:</strong> {contact.phone}
+                </p>
+                <p>
+                  <strong>Address:</strong> {contact.address.street},{" "}
+                  {contact.address.suite}, {contact.address.city}
+                </p>
+                <p>
+                  <strong>Website:</strong>{" "}
+                  <a href={contact.website}>{contact.website}</a>
+                </p>
+                <p>
+                  <strong>Company:</strong> {contact.company.name}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      ))}
     </div>
   );
 };
