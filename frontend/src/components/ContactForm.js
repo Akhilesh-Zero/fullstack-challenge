@@ -14,9 +14,12 @@ const ContactForm = ({ onContactAdded }) => {
     companyName: "",
   });
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    setSuccess(null); // reset success message
+    setError(null);
 
     // Simple validation: ensuring all fields are filled before submitting
     const requiredFields = [
@@ -52,26 +55,32 @@ const ContactForm = ({ onContactAdded }) => {
       },
     };
 
-    axios
-      .post("http://localhost:5000/contacts", contactData)
-      .then((response) => {
-        onContactAdded(response.data);
-        setFormData({
-          name: "",
-          username: "",
-          email: "",
-          street: "",
-          suite: "",
-          city: "",
-          phone: "",
-          website: "",
-          companyName: "",
-        });
-        setError(null);
-      })
-      .catch((error) => {
-        setError("There was an error adding the contact.");
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/contacts`,
+        contactData
+      );
+      onContactAdded(response.data);
+      setFormData({
+        name: "",
+        username: "",
+        email: "",
+        street: "",
+        suite: "",
+        city: "",
+        phone: "",
+        website: "",
+        companyName: "",
       });
+      setSuccess("Contact added successfully!");
+    } catch (error) {
+      const errorMsg =
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : "There was an error adding the contact.";
+      setError(errorMsg);
+      console.log(error);
+    }
   };
 
   return (

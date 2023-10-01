@@ -1,0 +1,12 @@
+# Ignore Node.js modules
+node_modules/
+
+# Ignore SQLite database file
+contacts.db
+
+# Ignore environment files (if any)
+.env
+
+# Ignore logs and generated files
+logs/
+dist/

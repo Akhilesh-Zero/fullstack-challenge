@@ -1,7 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
-const ContactsList = ({ contacts }) => {
+const ContactList = () => {
+  const [contacts, setContacts] = useState([]);
   const [expandedContactId, setExpandedContactId] = useState(null);
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/contacts")
+      .then((response) => {
+        setContacts(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data: ", error);
+      });
+  }, []);
 
   return (
     <div className="container mt-4" style={{ maxWidth: "600px" }}>
@@ -54,4 +67,4 @@ const ContactsList = ({ contacts }) => {
   );
 };
 
-export default ContactsList;
+export default ContactList;
