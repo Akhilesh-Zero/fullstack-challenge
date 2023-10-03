@@ -1,5 +1,3 @@
-# <<<<<<< HEAD
-
 # fullstack-challenge
 
 # Contact Manager Application 📖
@@ -77,4 +75,3 @@
 - **Frontend**: React.js
 - **Backend**: Express.js
 - **Database**: SQLite3 (with Sequelize ORM)
-  > > > > > > > 720bd11ba286a05f024e3518879cb3b6b2e45410
