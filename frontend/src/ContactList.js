@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
+import { UserContext } from "./UserContext";
 
 function ContactList({ setIsAddingContact }) {
-  const [selectedContact, setSelectedContact] = useState(null);
+  const [selectedContactId, setSelectedContactId] = useState(null);
   const [contacts, setContacts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const { isLoggedIn } = useContext(UserContext);
 
-  const fetchContacts = async (id) => {
-    let endpoint = "http://localhost:5000/contacts";
-    if (id) endpoint += `/${id}`;
+  // const { user } = useContext(UserContext);
+  // console.log(user);
+  const fetchContacts = async () => {
+    const endpoint = "http://localhost:5000/contacts";
 
     try {
       const response = await fetch(endpoint);
@@ -20,44 +23,65 @@ function ContactList({ setIsAddingContact }) {
     }
   };
 
+  const displayedContacts = searchTerm.trim()
+    ? contacts.filter((contact) =>
+        contact.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : contacts;
+
+  const handleSearch = () => {
+    // For now, just call a re-render to filter displayedContacts
+    setSearchTerm(searchTerm);
+  };
+
   useEffect(() => {
     fetchContacts();
   }, []);
 
+  console.log(contacts);
   return (
     <div className="contact-list-wrapper">
       <div className="search-section">
         <input
           type="text"
-          placeholder="Search by ID or Name..."
+          placeholder="Search by Name..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="form-control"
         />
-        <button className="btn btn-outline-info">
+        <button className="btn btn-outline-info" onClick={handleSearch}>
           <i className="fas fa-search"></i>
         </button>
       </div>
 
       <div className="contact-list-container">
-        {contacts.map((contact) => (
-          <div key={contact.id} className="mb-3">
+        {displayedContacts.map((contact, index) => (
+          <div key={contact.id + "-" + index} className="mb-3">
             <div
               className="contact-name"
               onClick={() =>
-                setSelectedContact(
-                  contact.id === selectedContact ? null : contact.id
+                setSelectedContactId(
+                  contact.id !== selectedContactId ? contact.id : null
                 )
               }
             >
-              {contact.name}
-              <span
-                className={`arrow ${
-                  contact.id === selectedContact ? "arrow-up" : "arrow-down"
-                }`}
-              ></span>
+              <span>{contact.name}</span>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                {contact.source === "external" && (
+                  <span className="label-external">(ext)</span>
+                )}
+                {contact.source === "internal" && (
+                  <span className="label-internal">(int)</span>
+                )}
+                <span
+                  className={`arrow ${
+                    contact.id === selectedContactId ? "arrow-up" : "arrow-down"
+                  }`}
+                ></span>
+              </div>
             </div>
-            {contact.id === selectedContact && (
+
+            {contact.id === selectedContactId && (
               <div className="mt-2">
                 <p>
                   <strong>Email:</strong> {contact.email}
@@ -65,6 +89,38 @@ function ContactList({ setIsAddingContact }) {
                 <p>
                   <strong>Phone:</strong> {contact.phone}
                 </p>
+                <p>
+                  <strong>Website:</strong> {contact.website}
+                </p>
+                <p>
+                  <strong>Company:</strong>{" "}
+                  {contact.companyName ||
+                  (contact.company && contact.company.name)
+                    ? contact.companyName || contact.company.name
+                    : "N/A"}
+                </p>
+                {isLoggedIn ? (
+                  // Check if contact is from internal source
+                  contact.source === "internal" ? (
+                    <Link to={`/edit/${contact.id}`}>
+                      <button>Edit</button>
+                    </Link>
+                  ) : (
+                    <button
+                      onClick={() =>
+                        alert(
+                          "This is an External Contact. Please contact External Admin to edit."
+                        )
+                      }
+                    >
+                      Edit
+                    </button>
+                  )
+                ) : (
+                  <button onClick={() => alert("Please login to edit.")}>
+                    Edit
+                  </button>
+                )}
               </div>
             )}
           </div>

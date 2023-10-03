@@ -76,6 +76,7 @@ body {
 .arrow {
   border-left: 6px solid transparent;
   border-right: 6px solid transparent;
+  margin-left: 10px;
 }
 
 .arrow-up {
@@ -122,4 +123,41 @@ form .mb-3 {
   display: flex;
   flex-direction: column;
   overflow: hidden; /* Important */
+}
+
+.label-external {
+  color: red;
+  font-size: 0.8rem;
+  margin-left: 5px;
+}
+
+.label-internal {
+  color: green;
+  font-size: 0.8rem;
+  margin-left: 5px;
+}
+
+.btn-success {
+  background-color: green;
+  font-weight: bold;
+  color: #ffffff;
+}
+.btn-danger {
+  background-color: red;
+}
+
+@media (max-width: 768px) {
+  .app-container {
+    height: 100vh;
+    width: 100vw;
+    overflow: auto;
+  }
+}
+
+@media screen and (min-width: 600px) and (max-width: 1024px) and (orientation: portrait) {
+  .app-container {
+    height: 100vh;
+    width: 100vw;
+    overflow: auto;
+  }
 }

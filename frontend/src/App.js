@@ -7,6 +7,7 @@ import LoginPage from "./LoginPage";
 import RegisterPage from "./RegisterPage";
 import Layout from "./Layout";
 import UserPage from "./UserPage";
+import EditContact from "./EditContact";
 import "./App.css";
 
 function App() {
@@ -42,6 +43,7 @@ function App() {
               <RegisterPage />
             </Route>
             <Route path="/user" exact component={UserPage} />
+            <Route path="/edit/:id" component={EditContact} />
             {/* Add future routes as needed */}
           </Switch>
         </Layout>

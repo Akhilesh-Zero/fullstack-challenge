@@ -1,6 +1,39 @@
 const axios = require("axios");
 const Contact = require("../models/Contact");
 
+exports.updateContact = async (req, res) => {
+  try {
+    const contact = await Contact.findByPk(req.params.id);
+
+    if (!contact) {
+      return res.status(404).json({ error: "Contact not found" });
+    }
+
+    // Update the contact with new data
+    const updatedContact = await contact.update(req.body);
+
+    res.json(updatedContact);
+  } catch (error) {
+    console.error("Error updating contact:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+exports.getContactById = async (req, res) => {
+  try {
+    const contact = await Contact.findByPk(req.params.id);
+
+    if (!contact) {
+      return res.status(404).json({ error: "Contact not found" });
+    }
+
+    res.json(contact);
+  } catch (error) {
+    console.error("Error fetching contact:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 exports.createContact = async (req, res) => {
   const {
     name,
@@ -52,6 +85,12 @@ exports.getAllContacts = async (req, res) => {
     const response = await axios.get(
       "https://jsonplaceholder.typicode.com/users"
     );
+
+    // const externalContacts = response.data.map((contact) => ({
+    //   ...contact,
+    //   source: "external",
+    // }));
+
     const externalContacts = response.data.map((contact) => ({
       id: contact.id,
       name: contact.name,
@@ -63,13 +102,22 @@ exports.getAllContacts = async (req, res) => {
       phone: contact.phone,
       website: contact.website,
       companyName: contact.company.name,
+      source: "external",
     }));
 
     // Fetch contacts from your own database
+
+    //     const localContacts = await Contact.findAll();
+    // const formattedLocalContacts = localContacts.map((contact) => ({
+    //   ...contact.get({ plain: true }),
+    //   source: "internal",
+    // }));
+
     const localContacts = await Contact.findAll();
-    const formattedLocalContacts = localContacts.map((contact) =>
-      contact.get({ plain: true })
-    );
+    const formattedLocalContacts = localContacts.map((contact) => ({
+      ...contact.get({ plain: true }),
+      source: "internal",
+    }));
 
     // Combine the contacts from both sources
     const allContacts = [...externalContacts, ...formattedLocalContacts];

@@ -1,44 +1,70 @@
-const sqlite3 = require("sqlite3").verbose();
+const sequelize = require("./models/database");
+const bcrypt = require("bcrypt");
+const Contact = require("./models/Contact");
+const User = require("./models/User");
 
-// Open the database (this will create a new SQLite file named mydb.sqlite3 if it doesn't exist)
-const db = new sqlite3.Database("./mydb.sqlite3");
+async function initDatabase() {
+  try {
+    await sequelize.sync({ force: true }); // force: true will drop tables if they exist
 
-// Use serialize to ensure sequential execution of the commands
-db.serialize(() => {
-  // Create the contacts table if it doesn't exist
-  db.run(`
-        CREATE TABLE IF NOT EXISTS contacts (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            username TEXT NOT NULL,
-            email TEXT NOT NULL,
-            street TEXT NOT NULL,
-            suite TEXT,
-            city TEXT NOT NULL,
-            zipcode TEXT,
-            lat TEXT,
-            lng TEXT,
-            phone TEXT NOT NULL,
-            website TEXT,
-            company_name TEXT,
-            catchPhrase TEXT,
-            bs TEXT
-        );
-    `);
+    const hashedPassword = await bcrypt.hash("IamBatman", 10);
 
-  // Create the users table if it doesn't exist
-  db.run(`
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL,
-            password TEXT NOT NULL,  -- Assuming you want to store a hashed password
-            email TEXT NOT NULL,
-            firstName TEXT,
-            lastName TEXT,
-            role TEXT DEFAULT 'user'
-        );
-    `);
-});
+    // Seed user data
+    await User.create({
+      username: "BruceWayne",
+      password: hashedPassword,
+      email: "bruce@wayneenterprises.com",
+      firstName: "Bruce",
+      lastName: "Wayne",
+    });
 
-// Close the database connection
-db.close();
+    // Seed contacts data
+    const contacts = [
+      {
+        name: "Clark Kent",
+        username: "Superman",
+        email: "clark.kent@dailyplanet.com",
+        street: "123 Daily Planet St.",
+        suite: "Apt 1",
+        city: "Metropolis",
+        phone: "123-456-7890",
+        website: "www.dailyplanet.com",
+        company_name: "Daily Planet",
+      },
+      {
+        name: "Diana Prince",
+        username: "WonderWoman",
+        email: "diana@themyscira.com",
+        street: "123 Paradise Island Blvd.",
+        suite: "Temple 2",
+        city: "Themyscira",
+        phone: "123-456-7891",
+        website: "www.themyscira.com",
+        company_name: "Amazon Warriors",
+      },
+      {
+        name: "Bruce Wayne",
+        username: "Batman",
+        email: "bruce@wayneenterprises.com",
+        street: "1007 Mountain Drive",
+        suite: "Batcave",
+        city: "Gotham",
+        phone: "123-456-7892",
+        website: "www.wayneenterprises.com",
+        company_name: "Wayne Enterprises",
+      },
+    ];
+
+    for (let contact of contacts) {
+      await Contact.create(contact);
+    }
+
+    console.log("Database initialization and seeding completed!");
+  } catch (error) {
+    console.error("Error initializing and seeding database:", error);
+  } finally {
+    await sequelize.close();
+  }
+}
+
+initDatabase();
