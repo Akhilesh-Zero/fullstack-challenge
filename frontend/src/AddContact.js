@@ -61,6 +61,10 @@ function AddContact() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (!localStorage.getItem("username")) {
+      alert("Log in to add contact!");
+      return;
+    }
     setIsLoading(true);
 
     const formattedContact = {

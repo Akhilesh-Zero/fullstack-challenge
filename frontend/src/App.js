@@ -1,31 +1,52 @@
-import React from "react";
+import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { UserProvider } from "./UserContext";
 import ContactList from "./ContactList";
 import AddContact from "./AddContact";
+import LoginPage from "./LoginPage";
+import RegisterPage from "./RegisterPage";
+import Layout from "./Layout";
+import UserPage from "./UserPage";
 import "./App.css";
 
 function App() {
-  return (
-    <Router>
-      <div className="app-container">
-        <div className="header">
-          <h1>Contact</h1>
-          <button className="user-icon-btn">
-            <i className="fas fa-user"></i> {/* Placeholder for future login */}
-          </button>
-        </div>
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    !!localStorage.getItem("username")
+  );
 
-        <Switch>
-          <Route path="/" exact>
-            <ContactList />
-          </Route>
-          <Route path="/add">
-            <AddContact />
-          </Route>
-          {/* Add future routes as needed */}
-        </Switch>
-      </div>
-    </Router>
+  const login = (username) => {
+    localStorage.setItem("username", username);
+    setIsLoggedIn(true);
+  };
+
+  const logout = () => {
+    localStorage.removeItem("username");
+    setIsLoggedIn(false);
+  };
+
+  return (
+    <UserProvider value={{ isLoggedIn, login, logout }}>
+      <Router>
+        <Layout>
+          <Switch>
+            <Route path="/" exact>
+              <ContactList />
+            </Route>
+            <Route path="/add">
+              <AddContact />
+            </Route>
+            <Route path="/login">
+              <LoginPage />
+            </Route>
+            <Route path="/register">
+              <RegisterPage />
+            </Route>
+            <Route path="/user" exact component={UserPage} />
+            {/* Add future routes as needed */}
+          </Switch>
+        </Layout>
+      </Router>
+    </UserProvider>
   );
 }
 
